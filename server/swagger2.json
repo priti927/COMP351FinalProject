@@ -1,0 +1,163 @@
+{
+  "swagger": "2.0",
+  "info": {
+    
+    "version": "1.0",
+    "title": "CAR MANAGMENT SYSTEM API Documentation"
+  },
+  
+  
+  "host": "theocomp351website.herokuapp.com",
+  "paths": {
+   "/getcars": {
+      "get": {
+        "tags": [
+          "Saved Cars"
+        ],
+        "summary": "Returns all the cars stored in database",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "200 OK"
+          },
+          "404":{
+            "description": "404 NOT FOUND"
+
+          }
+        }
+      }
+
+      
+    },
+
+    "/deletecar":{
+      "delete": {
+         "tags": [
+            "Saved Cars"
+          ],
+          "summary": "delete cars details stored in database",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+               "name": "id",
+               "in": "host/deletecar",
+               "description": "id of car details that needs to be deleted",
+               "required": true,
+               "type": "number",
+               "minimum": 1
+             }
+          ],
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            },
+            "404":{
+              "description": "404 NOT FOUND"
+   
+            }
+          }
+      }
+    },
+
+    "/updatecar":{
+      "put": {
+         "tags": [
+         "Saved Cars"
+       ],
+       "summary": "Update the details of the car stored in database",
+       "produces": [
+         "application/json"
+       ],
+       "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "minimum": 1
+          }
+         
+       ],
+       "responses": {
+         "200": {
+           "description": "200 OK",
+           "examples": {
+            "id": "64",
+            "car manufacturer": "toyota",
+            "car colour": "black",
+            "car model": "corola",
+            "car year": "2020",
+            "car mileage": "101010",
+            "car price": "230000" 
+         }
+         },
+         "404":{
+           "description": "404 NOT FOUND"
+
+         }
+       }
+
+      }
+    },
+
+    "/savecar":{
+      "post": {
+         "tags": [
+            "Saved Cars"
+          ],
+          "summary": "store the car details in database",
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "200 OK",
+              "examples": {
+               "id": "64",
+               "car manufacturer": "toyota",
+               "car colour": "black",
+               "car model": "corola",
+               "car year": "2020",
+               "car mileage": "101010",
+               "car price": "230000" 
+            }
+            },
+            "404":{
+              "description": "404 NOT FOUND"
+   
+            }
+          }
+      }
+    },
+
+    "/getcars/{withfilters}": {
+      "get": {
+        "tags": [
+          "Saved Cars"
+        ],
+        "summary": "filter tha stores car details",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "200 OK"
+          },
+          "404":{
+            "description": "404 NOT FOUND"
+
+          }
+        }
+      }
+
+      
+    }
+  }
+}
+
+
