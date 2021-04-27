@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <h1>Car Dealership Database</h1>
+
+</head>
+
+<body>
+    <button class= "button button3" onclick="toggleFilterArea(this)">Show Filters</button>
+    <h3 id="delayWarning" style="display: none;">Loading...</h3>
+    <div id="filters" style="display: none;">
+        <label for="manufacturer">Manufacturer</label>
+        <input type="text" name="manufacturer" id="manufacturer">
+        <label for="model">Model</label>
+        <input type="text" name="model" id="model">
+        <label for="minYear">Minimum Year</label>
+        <input type="number" name="minYear" id="minYear" min=1900 max=2022>
+        <label for="maxYear">Maximum Year</label>
+        <input type="number" name="maxYear" id="maxYear" min=1900 max=2022>
+        <label for="colour">Colour</label>
+        <input type="text" name="colour" id="colour">
+        <label for="minMileage">Minimum Mileage</label>
+        <input type="number" name="minMileage" id="minMileage" min=0>
+        <label for="maxMileage">Maximum Mileage</label>
+        <input type="number" name="maxMileage" id="maxMileage" min=0>
+        <label for="minPrice">Minimum Price</label>
+        <input type="number" name="minPrice" id="minPrice" min=0>
+        <label for="maxPrice">Maximum Price</label>
+        <input type="number" name="maxPrice" id="maxPrice" min=0>
+        <button class= "button button3" onclick="reloadWithFilters()">Filter Results</button>
+        <button class= "button button3" onclick="window.location='viewCars.html'">Remove Filters</button>
+        <hr>
+    </div>
+    <div id="getcars"></div>
+    <a href="admin.html"><button class="button button3">Back</button></a>
+</body>
+
+</html>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    var outputArea = document.getElementById("getcars");
+    var cars;
+
+    var queryManufacturerFilter;
+    var queryModelFilter;
+    var queryMinYearFilter;
+    var queryMaxYearFilter;
+    var queryColourFilter;
+    var queryMinMileageFilter;
+    var queryMaxMileageFilter;
+    var queryMinPriceFilter;
+    var queryMaxPriceFilter;
+
+    function savedcars() {
+        document.getElementById("delayWarning").style.display = "block";
+        xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "https://theocomp351website.herokuapp.com/getcars", true);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                cars = JSON.parse(this.responseText);
+                document.getElementById("delayWarning").style.display = "none";
+                outputResults();
+            }
+        };
+        xhttp.send();
+    }
+
+    function toggleFilterArea(el) {
+        filterArea = document.getElementById("filters");
+        if (filterArea.style.display == "none") {
+            filterArea.style.display = "block";
+            el.innerText = "Hide Filters"
+        } else {
+            filterArea.style.display = "none";
+            el.innerText = "Show Filters"
+        }
+    }
+
+    function reloadWithFilters() {
+        manufacturerFilterFieldValue = document.getElementById("manufacturer").value;
+        modelFilterFieldValue = document.getElementById("model").value;
+        minYearFilterFieldValue = parseInt(document.getElementById("minYear").value);
+        maxYearFilterFieldValue = parseInt(document.getElementById("maxYear").value);
+        colourFilterFieldValue = document.getElementById("colour").value;
+        minMileageFilterFieldValue = parseInt(document.getElementById("minMileage").value);
+        maxMilieageFilterFieldValue = parseInt(document.getElementById("maxMileage").value);
+        minPriceFilterFieldValue = parseInt(document.getElementById("minPrice").value);
+        maxPriceFilterFieldValue = parseInt(document.getElementById("maxPrice").value);
+
+        if (minYearFilterFieldValue > maxYearFilterFieldValue) {
+            alert("Minimum Year cannot be greater than Maximum Year");
+            return;
+        }
+
+        if (minMileageFilterFieldValue > maxMilieageFilterFieldValue) {
+            alert("Minimum Mileage cannot be greater than Maximum Mileage");
+            return;
+        }
+
+        if (minPriceFilterFieldValue > maxPriceFilterFieldValue) {
+            alert("Minimum Price cannot be greater than Maximum Price");
+            return;
+        }
+
+        window.location = `viewCars.html?manufacturer=${manufacturerFilterFieldValue}`
+            + `&model=${modelFilterFieldValue}`
+            + `&minYear=${minYearFilterFieldValue}`
+            + `&maxYear=${maxYearFilterFieldValue}`
+            + `&colour=${colourFilterFieldValue}`
+            + `&minMileage=${minMileageFilterFieldValue}`
+            + `&maxMileage=${maxMilieageFilterFieldValue}`
+            + `&minPrice=${minPriceFilterFieldValue}`
+            + `&maxPrice=${maxPriceFilterFieldValue}`;
+
+    }
+
+    function checkAgainstFilters(car) {
+        if (queryManufacturerFilter != null && car.manufacturer.toUpperCase() != queryManufacturerFilter.toUpperCase()) return false;
+        if (queryModelFilter != null && car.model.toUpperCase() != queryM.toUpperCase()) return false;
+        if (queryMinYearFilter != null && car.year < queryMinYearFilter) return false;
+        if (queryMaxYearFilter != null && car.year > queryMaxYearFilter) return false;
+        if (queryColourFilter != null && car.colour.toUpperCase() != queryColourFilter.toUpperCase()) return false;
+        if (queryMinMileageFilter != null && car.mileage < queryMinMileageFilter) return false;
+        if (queryMaxMileageFilter != null && car.mileage > queryMaxMileageFilter) return false;
+        if (queryMinPriceFilter != null && car.price < queryMinPriceFilter) return false;
+        if (queryMaxPriceFilter != null && car.price > queryMaxPriceFilter) return false;
+        return true;
+    }
+
+    function outputResults() {
+
+        outputArea.innerHTML = "";
+
+        for (i = 0; i < cars.length; i++) {
+            if (checkAgainstFilters(cars[i])) {
+                var list = document.createElement("ul");
+                var manufacturer = document.createElement("li");
+                var model = document.createElement("li");
+                var year = document.createElement("li");
+                var colour = document.createElement("li");
+                var mileage = document.createElement("li");
+                var price = document.createElement("li");
+                var editCar = document.createElement("button");
+                editCar.className="button button4" ;
+                var deleteCar = document.createElement("button");
+                deleteCar.className="button button4";
+
+                list.setAttribute("class", "carItem");
+                list.setAttribute("id", "car_" + i);
+                manufacturer.setAttribute("class", "manufacturer");
+                model.setAttribute("class", "model");
+                year.setAttribute("class", "year");
+                colour.setAttribute("class", "colour");
+                mileage.setAttribute("class", "mileage");
+                price.setAttribute("class", "price");
+
+                editCar.setAttribute("onclick", "editResult(this.parentNode)");
+                deleteCar.setAttribute("onclick", "deleteResult(this.parentNode)");
+
+                manufacturer.innerText = 'Manufacturer:  ' + cars[i].manufacturer;
+                model.innerText = 'Model:  ' + cars[i].model;
+                year.innerText = 'Year:  ' + cars[i].year;
+                colour.innerText = 'Colour:  ' + cars[i].colour;
+                mileage.innerText = 'Mileage:  ' + new Intl.NumberFormat().format(cars[i].mileage);
+                price.innerText = 'Price:  ' + new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(cars[i].price);
+                editCar.innerText = "Edit";
+                deleteCar.innerText = "Delete";
+
+                list.append(manufacturer, model, year, colour, mileage, price, editCar, deleteCar);
+                outputArea.append(list);
+            }
+        }
+    }
+
+    function deleteResult(el) {
+        el.style.backgroundColor = "#ff6666";
+        setTimeout(function () {
+            if (confirm("Are you sure you want to delete this car?\nPress OK if you wish to proceed.")) {
+                localCarID = parseInt(el.id.split("_")[1]);
+                DBcarID = cars[localCarID].id;
+                xhttp = new XMLHttpRequest();
+                xhttp.open("POST", "https://theocomp351website.herokuapp.com/deletecar", true);
+                xhttp.send(JSON.stringify({ "id": DBcarID }));
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log(this.responseText);
+                        cars.splice(localCarID, 1);
+                        outputResults();
+                    }
+                };
+            } else {
+                el.style.backgroundColor = "initial";
+            }
+        }, 20)
+
+    }
+
+    function editResult(el) {
+        localCarID = parseInt(el.id.split("_")[1]);
+        window.location = "update.html?id=" + localCarID;
+    }
+
+    function setup() {
+
+        queryManufacturerFilter = urlParams.get("manufacturer");
+        if (queryManufacturerFilter == "") queryManufacturerFilter = null;
+
+        queryModelFilter = urlParams.get("model");
+        if (queryModelFilter == "") queryModelFilter = null;
+
+        queryMinYearFilter = urlParams.get("minYear");
+        if (queryMinYearFilter == "") queryMinYearFilter = null;
+
+        queryMaxYearFilter = urlParams.get("maxYear");
+        if (queryMaxYearFilter == "") queryMaxYearFilter = null;
+
+        queryColourFilter = urlParams.get("colour");
+        if (queryColourFilter == "") queryColourFilter = null;
+
+        queryMinMileageFilter = urlParams.get("minMileage");
+        if (queryMinMileageFilter == "") queryMinMileageFilter = null;
+
+        queryMaxMileageFilter = urlParams.get("maxMileage");
+        if (queryMaxMileageFilter == "") queryMaxMileageFilter = null;
+
+        queryMinPriceFilter = urlParams.get("minPrice");
+        if (queryMinPriceFilter == "") queryMinPriceFilter = null;
+
+        queryMaxPriceFilter = urlParams.get("maxPrice");
+        if (queryMaxPriceFilter == "") queryMaxPriceFilter = null;
+
+        savedcars();
+    }
+
+    window.onload = setup();
+
+</script>

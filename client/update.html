@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <h1>Update Car Details in Database</h1>
+
+</head>
+
+<body>
+    <div id="cars">
+        <form>
+
+            <label for="Manufacturer">Car Manufacturer</label>
+            <input type="text" id="Manufacturer" name="Manufacturer">
+
+            <label for="Model">Car Model</label>
+            <input type="text" id="Model" name="Model">
+
+            <label for="Year">Car Year</label>
+            <input type="number" id="Year" name="Year">
+
+            <label for="Colour">Car Colour</label>
+            <input type="text" id="colour" name="colour">
+
+            <label for="Mileage">Car Mileage</label>
+            <input type="number" id="Mileage" name="Mileage">
+
+            <label for="price">Car Price</label>
+            <input type="number" id="price" name="price">
+
+
+
+
+        </form>
+        <input type="submit" class="button button4" value="Update" onclick=" updateCars()">
+        <a href="viewCars.html"><button class="button button3">Back</button></a>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const localCarID = urlParams.get('id');
+    var DBcarID;
+    var cars;
+
+    const Manufacturer = document.getElementById("Manufacturer");
+    const Model = document.getElementById("Model");
+    const Year = document.getElementById("Year");
+    const Colour = document.getElementById("colour");
+    const Mileage = document.getElementById("Mileage");
+    const Price = document.getElementById("price");
+
+    function fillInfo() {
+        xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "https://theocomp351website.herokuapp.com/getcars", true);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                cars = JSON.parse(this.responseText);
+                DBcarID = cars[localCarID].id;
+                Manufacturer.value = cars[localCarID].manufacturer;
+                Model.value = cars[localCarID].model;
+                Year.value = cars[localCarID].year;
+                Colour.value = cars[localCarID].colour;
+                Mileage.value = cars[localCarID].mileage;
+                Price.value = cars[localCarID].price;
+            }
+        };
+        xhttp.send();
+    }
+
+    function updateCars() {
+        if (confirm("Press OK to confirm updated info")) {
+            const updateCar = { "id": DBcarID, "manufacturer": Manufacturer.value, "model": Model.value, "year": Year.value, "colour": Colour.value, "mileage": Mileage.value, "price": Price.value };
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.open("POST", "https://theocomp351website.herokuapp.com/updatecar/", true);
+
+            const car = JSON.stringify(updateCar);
+            xhttp.send(car);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    alert(this.responseText);
+                    window.location = "viewCars.html";
+                }
+            };
+        }
+    }
+
+    window.onload = fillInfo();
+
+</script>
